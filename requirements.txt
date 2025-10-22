@@ -1,0 +1,5 @@
+# Audio
+pygame==2.5.2
+
+# Utility
+typing-extensions>=4.12.2
