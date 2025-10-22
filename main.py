@@ -31,7 +31,9 @@ from tkinter import ttk, messagebox
 # Optional: pygame for sound
 try:
   import pygame
+  pygame.mixer.pre_init(44100, -16, 2, 1024)
   pygame.mixer.init()
+  pygame.mixer.music.set_volume(0.5)
   SOUND_OK = True
 except Exception:
   SOUND_OK = False
@@ -45,21 +47,20 @@ SOUND_FILES = {
   "wrong": os.path.join(ASSETS_DIR, "incorrect.wav"),
   "tick": os.path.join(ASSETS_DIR, "tick.wav"),  # optional letter-reveal sound
   # Background soundtrack for timer (looped while timer runs)
-  "soundtrack": os.path.join(ASSETS_DIR, "theme4.wav"),
+  "soundtrack": os.path.join(ASSETS_DIR, "theme.wav"),
+  "last_letter": os.path.join(ASSETS_DIR, "ding.wav"),
 }
 
 
 # Fallback sample chain (edit in Host window before pressing "Load Chain")
 SAMPLE_CHAIN = [
-  "PEACH",  # top word (revealed)
-  "PEARL",
-  "EARLY",
-  "ARLENE",
-  "LENDER",
-  "ENDERGUNN",  # this is just filler; replace with your real chain words
-  "GUNNER",
-  "NERD",
-  "RED",   # bottom word (revealed)
+  "SOLAR",  
+  "POWER",
+  "PLANT", 
+  "FOOD",
+  "CHAIN", 
+  "LINK", 
+  "CARD"
 ]
 
 
@@ -247,14 +248,14 @@ class App:
     # Quick buttons to reveal letters at the nearest unsolved word above/below
     row2b = tk.Frame(parent)
     row2b.pack(fill=tk.X, padx=10, pady=4)
-    tk.Button(row2b, text="Reveal Letter Above (topmost unsolved)", command=self._on_give_letter_above).grid(row=0, column=0, padx=4)
-    tk.Button(row2b, text="Reveal Letter Below (bottommost unsolved)", command=self._on_give_letter_below).grid(row=0, column=1, padx=4)
+    tk.Button(row2b, text="LETTER BELOW", command=self._on_give_letter_above).grid(row=0, column=0, padx=4)
+    tk.Button(row2b, text="LETTER ABOVE", command=self._on_give_letter_below).grid(row=0, column=1, padx=4)
 
     # Reveal WHOLE word above/below (no index)
     row2c = tk.Frame(parent)
     row2c.pack(fill=tk.X, padx=10, pady=4)
-    tk.Button(row2c, text="Reveal Word Above (topmost unsolved)", command=self._on_reveal_word_above).grid(row=0, column=0, padx=4)
-    tk.Button(row2c, text="Reveal Word Below (bottommost unsolved)", command=self._on_reveal_word_below).grid(row=0, column=1, padx=4)
+    tk.Button(row2c, text="BELOW CORRECT", command=self._on_reveal_word_above).grid(row=0, column=0, padx=4)
+    tk.Button(row2c, text="ABOVE CORRECT", command=self._on_reveal_word_below).grid(row=0, column=1, padx=4)
 
     guess_row = tk.Frame(parent)
     guess_row.pack(fill=tk.X, padx=10, pady=10)
@@ -320,7 +321,7 @@ class App:
       self._maybe_puzzle_solved()
     elif withheld:
       self.refresh_display(highlight_idx=idx)
-      self.sounder.play("tick")
+      self.sounder.play("last_letter")
       self.status_var.set("Last letter withheld — ? shown.")
       self._maybe_puzzle_solved()
     else:
